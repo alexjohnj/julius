@@ -70,6 +70,7 @@ func encryptMessage(c *cli.Context) {
 
 func decryptMessage(c *cli.Context) {
 	ciphertext := getUserMessage(c)
+	ciphertext = stripJuliusHeader(c, ciphertext)
 	key := c.Int("key")
 
 	plaintext := caesar.DecryptCiphertext(ciphertext, key)
@@ -109,4 +110,14 @@ func getUserMessage(c *cli.Context) string {
 		messageArgument = c.Args()[0] // The user passed some text as an argument
 	}
 	return messageArgument
+}
+
+func stripJuliusHeader(c *cli.Context, message string) string {
+	headerText := fmt.Sprintf("-----BEGIN JULIUS MESSAGE-----\nVersion: %s\n\n", c.App.Version)
+	footerText := fmt.Sprintf("-----END JULIUS MESSAGE-----")
+
+	message = strings.Replace(message, headerText, "", 1)
+	message = strings.Replace(message, footerText, "", 1)
+
+	return message
 }
