@@ -1,8 +1,14 @@
 package main
 
 import (
+	"bufio"
+	"code.google.com/p/go.crypto/ssh/terminal"
+	"fmt"
+	"github.com/alexjohnj/caesar"
 	"github.com/codegangsta/cli"
+	"log"
 	"os"
+	"strings"
 )
 
 func main() {
@@ -46,9 +52,53 @@ func main() {
 }
 
 func encryptMessage(c *cli.Context) {
+	plaintext := getUserMessage(c)
+	key := c.Int("key")
 
+	ciphertext := caesar.EncryptPlaintext(plaintext, key)
+
+	fmt.Println(ciphertext)
 }
 
 func decryptMessage(c *cli.Context) {
+	ciphertext := getUserMessage(c)
+	key := c.Int("key")
 
+	plaintext := caesar.DecryptCiphertext(ciphertext, key)
+
+	fmt.Println(plaintext)
+}
+
+func readFromFile(f *os.File) string {
+	var fileContent string
+	fileScanner := bufio.NewScanner(f)
+
+	// Read the first line from the File
+	fileScanner.Scan()
+	fileContent = fileScanner.Text()
+
+	// Read the remaining lines
+	for fileScanner.Scan() {
+		fileContent = strings.Join([]string{fileContent, fileScanner.Text()}, "\n")
+
+		if err := fileScanner.Err(); err != nil {
+			log.Fatal(err)
+		}
+	}
+	return fileContent
+}
+
+func getUserMessage(c *cli.Context) string {
+	var messageArgument string
+
+	// Try to determine if the user provided a message as an argument, piped one in or just didn't bother
+	if len(c.Args()) < 1 && !terminal.IsTerminal(int(os.Stdin.Fd())) {
+		messageArgument = readFromFile(os.Stdin) // Read the piped input
+	} else if len(c.Args()) < 1 && terminal.IsTerminal(int(os.Stdin.Fd())) {
+		fmt.Printf("Enter a message (CTRL+D to end entry):\n") // Prompt the user to enter something
+		messageArgument = readFromFile(os.Stdin)
+	} else {
+		messageArgument = c.Args()[0] // The user passed some text as an argument
+	}
+	return messageArgument
 }
