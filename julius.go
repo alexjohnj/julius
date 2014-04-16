@@ -11,6 +11,9 @@ import (
 	"strings"
 )
 
+const encryptedMessageHeader = "-----BEGIN JULIUS MESSAGE-----\n\n"
+const encryptedMessageFooter = "\n\n-----END JULIUS MESSAGE-----"
+
 func main() {
 	app := cli.NewApp()
 	app.Name = "julius"
@@ -62,7 +65,7 @@ func encryptMessage(c *cli.Context) {
 	ciphertext := caesar.EncryptPlaintext(plaintext, key)
 
 	if c.Bool("include-header") {
-		fmt.Printf("-----BEGIN JULIUS MESSAGE-----\nVersion: %s\n\n%s\n-----END JULIUS MESSAGE-----\n", c.App.Version, ciphertext)
+		fmt.Printf("%s%s%s", encryptedMessageHeader, ciphertext, encryptedMessageFooter)
 	} else {
 		fmt.Println(ciphertext)
 	}
@@ -113,11 +116,8 @@ func getUserMessage(c *cli.Context) string {
 }
 
 func stripJuliusHeader(c *cli.Context, message string) string {
-	headerText := fmt.Sprintf("-----BEGIN JULIUS MESSAGE-----\nVersion: %s\n\n", c.App.Version)
-	footerText := fmt.Sprintf("-----END JULIUS MESSAGE-----")
-
-	message = strings.Replace(message, headerText, "", 1)
-	message = strings.Replace(message, footerText, "", 1)
+	message = strings.Replace(message, encryptedMessageHeader, "", 1)
+	message = strings.Replace(message, encryptedMessageFooter, "", 1)
 
 	return message
 }
