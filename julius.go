@@ -29,6 +29,10 @@ func main() {
 					Value: 13,
 					Usage: "The key to use for the cipher.",
 				},
+				cli.BoolFlag{
+					Name:  "include-header, b",
+					Usage: "include a pgp style header in output",
+				},
 			},
 		},
 
@@ -57,7 +61,11 @@ func encryptMessage(c *cli.Context) {
 
 	ciphertext := caesar.EncryptPlaintext(plaintext, key)
 
-	fmt.Println(ciphertext)
+	if c.Bool("include-header") {
+		fmt.Printf("-----BEGIN JULIUS MESSAGE-----\nVersion: %s\n\n%s\n-----END JULIUS MESSAGE-----\n", c.App.Version, ciphertext)
+	} else {
+		fmt.Println(ciphertext)
+	}
 }
 
 func decryptMessage(c *cli.Context) {
