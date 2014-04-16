@@ -58,6 +58,10 @@ func main() {
   app.Run(os.Args)
 }
 
+/*----------------------------------------------
+                  CLI FUNCTIONS
+-----------------------------------------------*/
+
 func encryptMessage(c *cli.Context) {
   plaintext := getUserMessage(c)
   key := c.Int("key")
@@ -81,6 +85,25 @@ func decryptMessage(c *cli.Context) {
   fmt.Println(plaintext)
 }
 
+/*----------------------------------------------
+                HELPER FUNCTIONS
+-----------------------------------------------*/
+
+func getUserMessage(c *cli.Context) string {
+  var messageArgument string
+
+  // Try to determine if the user provided a message as an argument, piped one in or just didn't bother
+  if len(c.Args()) < 1 && !terminal.IsTerminal(int(os.Stdin.Fd())) {
+    messageArgument = readFromFile(os.Stdin) // Read the piped input
+  } else if len(c.Args()) < 1 && terminal.IsTerminal(int(os.Stdin.Fd())) {
+    fmt.Printf("Enter a message (CTRL+D to end entry):\n") // Prompt the user to enter something
+    messageArgument = readFromFile(os.Stdin)
+  } else {
+    messageArgument = c.Args()[0] // The user passed some text as an argument
+  }
+  return messageArgument
+}
+
 func readFromFile(f *os.File) string {
   var fileContent string
   fileScanner := bufio.NewScanner(f)
@@ -98,21 +121,6 @@ func readFromFile(f *os.File) string {
     }
   }
   return fileContent
-}
-
-func getUserMessage(c *cli.Context) string {
-  var messageArgument string
-
-  // Try to determine if the user provided a message as an argument, piped one in or just didn't bother
-  if len(c.Args()) < 1 && !terminal.IsTerminal(int(os.Stdin.Fd())) {
-    messageArgument = readFromFile(os.Stdin) // Read the piped input
-  } else if len(c.Args()) < 1 && terminal.IsTerminal(int(os.Stdin.Fd())) {
-    fmt.Printf("Enter a message (CTRL+D to end entry):\n") // Prompt the user to enter something
-    messageArgument = readFromFile(os.Stdin)
-  } else {
-    messageArgument = c.Args()[0] // The user passed some text as an argument
-  }
-  return messageArgument
 }
 
 func stripJuliusHeader(c *cli.Context, message string) string {
