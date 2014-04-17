@@ -18,13 +18,13 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "julius"
 	app.Version = "0.1.0"
-	app.Usage = "Encrypt and decrypt ASCII strings using a Caesar cipher"
+	app.Usage = "Encrypt and decrypt messages using the Caesar cipher."
 	app.Commands = []cli.Command{
 		{
 			Name:        "encrypt",
 			ShortName:   "e",
 			Usage:       "julius encrypt [options] [message]",
-			Description: "Encrypts a message using a key given with the -k flag. Defaults to 13 if no key is given.",
+			Description: "Encrypts a plaintext message. The default key is 13, use the --key flag to change it.",
 			Action:      encryptMessage,
 			Flags: []cli.Flag{
 				cli.IntFlag{
@@ -34,7 +34,7 @@ func main() {
 				},
 				cli.BoolFlag{
 					Name:  "include-header, b",
-					Usage: "include a pgp style header in output",
+					Usage: "Include a PGP style header in the encrypted output.",
 				},
 			},
 		},
@@ -43,13 +43,13 @@ func main() {
 			Name:        "decrypt",
 			ShortName:   "d",
 			Usage:       "julius decrypt [options] [message]",
-			Description: "Decrypts a message using a key given with the -k flag. Defaults to 13 if no key is given",
+			Description: "Decrypts ciphertext. By default it uses a key of 13. use the --key flag to change it.",
 			Action:      decryptMessage,
 			Flags: []cli.Flag{
 				cli.IntFlag{
 					Name:  "key, k",
 					Value: 13,
-					Usage: "The key used to decrypt the message.",
+					Usage: "The key to use to decrypt the message.",
 				},
 			},
 		},
