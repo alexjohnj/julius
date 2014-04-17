@@ -89,6 +89,8 @@ func decryptMessage(c *cli.Context) {
 								HELPER FUNCTIONS
 -----------------------------------------------*/
 
+// getUserMessage tries to obtain the user's message from either the command arguments, piped stdin or by prompting the user for it.
+// It returns the message as a string
 func getUserMessage(c *cli.Context) string {
 	var messageArgument string
 
@@ -104,6 +106,7 @@ func getUserMessage(c *cli.Context) string {
 	return messageArgument
 }
 
+// readFromFile reads a file line-by-line and returns its contents in a single string
 func readFromFile(f *os.File) string {
 	var fileContent string
 	fileScanner := bufio.NewScanner(f)
@@ -123,6 +126,7 @@ func readFromFile(f *os.File) string {
 	return fileContent
 }
 
+// stripJuliusHeader returns a string with the standard julius header/footer text removed
 func stripJuliusHeader(c *cli.Context, message string) string {
 	message = strings.Replace(message, encryptedMessageHeader, "", 1)
 	message = strings.Replace(message, encryptedMessageFooter, "", 1)
