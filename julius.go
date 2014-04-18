@@ -18,7 +18,7 @@ const encryptedMessageFooter = "\n\n-----END JULIUS MESSAGE-----"
 func main() {
 	app := cli.NewApp()
 	app.Name = "julius"
-	app.Version = "0.1.0"
+	app.Version = "0.1.1"
 	app.Usage = "Encrypt and decrypt messages using the Caesar cipher."
 	app.Commands = []cli.Command{
 		{
