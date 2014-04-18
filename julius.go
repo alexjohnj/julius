@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"code.google.com/p/go.crypto/ssh/terminal"
 	"fmt"
 	"github.com/alexjohnj/caesar"
@@ -71,7 +72,7 @@ func encryptMessage(c *cli.Context) {
 	if c.Bool("include-header") {
 		fmt.Printf("%s%s%s", encryptedMessageHeader, ciphertext, encryptedMessageFooter)
 	} else {
-		fmt.Println(ciphertext)
+		fmt.Printf("%s\n", ciphertext)
 	}
 }
 
@@ -82,7 +83,7 @@ func decryptMessage(c *cli.Context) {
 
 	plaintext := caesar.DecryptCiphertext(ciphertext, key)
 
-	fmt.Println(plaintext)
+	fmt.Printf("%s\n", plaintext)
 }
 
 /*----------------------------------------------
@@ -108,13 +109,13 @@ func getUserMessage(c *cli.Context) string {
 
 // readFromFile reads a file line-by-line and returns its contents in a single string
 func readFromFile(f *os.File) string {
-	fileCotent, err := ioutil.ReadAll(f)
+	fileContent, err := ioutil.ReadAll(f)
 
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	return string(fileCotent)
+	fileContent = bytes.TrimSuffix(fileContent, []byte("\n"))
+	return string(fileContent)
 }
 
 // stripJuliusHeader returns a string with the standard julius header/footer text removed
