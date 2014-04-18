@@ -1,11 +1,11 @@
 package main
 
 import (
-	"bufio"
 	"code.google.com/p/go.crypto/ssh/terminal"
 	"fmt"
 	"github.com/alexjohnj/caesar"
 	"github.com/codegangsta/cli"
+	"io/ioutil"
 	"log"
 	"os"
 	"strings"
@@ -108,22 +108,13 @@ func getUserMessage(c *cli.Context) string {
 
 // readFromFile reads a file line-by-line and returns its contents in a single string
 func readFromFile(f *os.File) string {
-	var fileContent string
-	fileScanner := bufio.NewScanner(f)
+	fileCotent, err := ioutil.ReadAll(f)
 
-	// Read the first line from the File
-	fileScanner.Scan()
-	fileContent = fileScanner.Text()
-
-	// Read the remaining lines
-	for fileScanner.Scan() {
-		fileContent = strings.Join([]string{fileContent, fileScanner.Text()}, "\n")
-
-		if err := fileScanner.Err(); err != nil {
-			log.Fatal(err)
-		}
+	if err != nil {
+		log.Fatal(err)
 	}
-	return fileContent
+
+	return string(fileCotent)
 }
 
 // stripJuliusHeader returns a string with the standard julius header/footer text removed
