@@ -54,6 +54,14 @@ func main() {
 				},
 			},
 		},
+
+		{
+			Name:        "brute",
+			ShortName:   "b",
+			Usage:       "julius brute [message]",
+			Description: "Brute forces the key for a ciphertext by trying all possibly keys.",
+			Action:      bruteForceMessage,
+		},
 	}
 
 	app.Run(os.Args)
@@ -84,6 +92,20 @@ func decryptMessage(c *cli.Context) {
 	plaintext := caesar.DecryptCiphertext(ciphertext, key)
 
 	fmt.Printf("%s\n", plaintext)
+}
+
+func bruteForceMessage(c *cli.Context) {
+	ciphertext := getUserMessage(c)
+	ciphertext = stripJuliusHeader(c, ciphertext)
+	var plaintexts [26]string
+
+	for key := 0; key < 26; key++ {
+		plaintexts[key] = caesar.DecryptCiphertext(ciphertext, key)
+	}
+
+	for key := 0; key < 26; key++ {
+		fmt.Printf("[Key: %d]: %s\n", key, plaintexts[key])
+	}
 }
 
 /*----------------------------------------------
