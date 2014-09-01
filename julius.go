@@ -82,26 +82,27 @@ func main() {
 -----------------------------------------------*/
 
 func encryptMessage(c *cli.Context) {
-	plaintext := getUserMessage(c)
-	key := c.Int("key")
+	inputMessage := new(Message)
+	inputMessage.plaintext = getUserMessage(c)
+	inputMessage.key = c.Int("key")
 
-	ciphertext := caesar.EncryptPlaintext(plaintext, key)
+	inputMessage.ciphertext = caesar.EncryptPlaintext(inputMessage.plaintext, inputMessage.key)
 
 	if c.Bool("include-header") {
-		fmt.Printf("%s%s%s", encryptedMessageHeader, ciphertext, encryptedMessageFooter)
+		fmt.Printf("%s%s%s", encryptedMessageHeader, inputMessage.ciphertext, encryptedMessageFooter)
 	} else {
-		fmt.Printf("%s\n", ciphertext)
+		fmt.Printf("%s\n", inputMessage.ciphertext)
 	}
 }
 
 func decryptMessage(c *cli.Context) {
-	ciphertext := getUserMessage(c)
-	ciphertext = stripJuliusHeader(c, ciphertext)
-	key := c.Int("key")
+	inputMessage := new(Message)
+	inputMessage.ciphertext = stripJuliusHeader(c, getUserMessage(c))
+	inputMessage.key = c.Int("key")
 
-	plaintext := caesar.DecryptCiphertext(ciphertext, key)
+	inputMessage.plaintext = caesar.DecryptCiphertext(inputMessage.ciphertext, inputMessage.key)
 
-	fmt.Printf("%s\n", plaintext)
+	fmt.Printf("%s\n", inputMessage.plaintext)
 }
 
 func bruteForceMessage(c *cli.Context) {
