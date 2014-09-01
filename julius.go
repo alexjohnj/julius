@@ -15,6 +15,16 @@ import (
 const encryptedMessageHeader = "-----BEGIN JULIUS MESSAGE-----\n\n"
 const encryptedMessageFooter = "\n\n-----END JULIUS MESSAGE-----"
 
+// Source for letter frequency:
+// http://en.wikipedia.org/wiki/Letter_frequency#Relative_frequencies_of_letters_in_the_English_language
+const englishFrequencyList = "etaoinshrdlcumwfgypbvkjxqz"
+
+type Message struct {
+	key        int
+	plaintext  string
+	ciphertext string
+}
+
 func main() {
 	app := cli.NewApp()
 	app.Name = "julius"
@@ -95,16 +105,40 @@ func decryptMessage(c *cli.Context) {
 }
 
 func bruteForceMessage(c *cli.Context) {
-	ciphertext := getUserMessage(c)
-	ciphertext = stripJuliusHeader(c, ciphertext)
-	var plaintexts [26]string
+	frequencyMap := make(map[rune]int)
 
-	for key := 0; key < 26; key++ {
-		plaintexts[key] = caesar.DecryptCiphertext(ciphertext, key)
+	// Get the user's input
+	inputMessage := new(Message)
+	inputMessage.ciphertext = stripJuliusHeader(c, getUserMessage(c))
+	var potentialMessages [26]Message
+
+	// Calculate the frequency of each letter in the ciphertext
+	for _, letter := range strings.ToLower(inputMessage.ciphertext) {
+		if letter >= 'a' && letter <= 'z' {
+			frequencyMap[letter]++
+		}
 	}
 
-	for key := 0; key < 26; key++ {
-		fmt.Printf("[Key: %d]: %s\n", key, plaintexts[key])
+	// Find the most frequent letter
+	var mostFrequentLetter rune
+	biggestFrequency := 0
+	for letter, frequency := range frequencyMap {
+		if frequency > biggestFrequency {
+			biggestFrequency = frequency
+			mostFrequentLetter = letter
+		}
+	}
+
+	// Determine the most probable keys based on the frequency of letters in the English Alphabet
+	for index, letter := range englishFrequencyList {
+		potentialMessage := new(Message)
+		potentialMessage.key = int((26 + (mostFrequentLetter - letter)) % 26)
+		potentialMessage.plaintext = caesar.DecryptCiphertext(inputMessage.ciphertext, potentialMessage.key)
+		potentialMessages[index] = *potentialMessage
+	}
+
+	for _, message := range potentialMessages {
+		fmt.Printf("[Key: %d]: %s\n", message.key, message.plaintext)
 	}
 }
 
