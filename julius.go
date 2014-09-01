@@ -97,7 +97,7 @@ func encryptMessage(c *cli.Context) {
 
 func decryptMessage(c *cli.Context) {
 	inputMessage := new(Message)
-	inputMessage.ciphertext = stripJuliusHeader(c, getUserMessage(c))
+	inputMessage.ciphertext = stripJuliusHeader(getUserMessage(c))
 	inputMessage.key = c.Int("key")
 
 	inputMessage.plaintext = caesar.DecryptCiphertext(inputMessage.ciphertext, inputMessage.key)
@@ -110,7 +110,7 @@ func bruteForceMessage(c *cli.Context) {
 
 	// Get the user's input
 	inputMessage := new(Message)
-	inputMessage.ciphertext = stripJuliusHeader(c, getUserMessage(c))
+	inputMessage.ciphertext = stripJuliusHeader(getUserMessage(c))
 	var potentialMessages [26]Message
 
 	// Calculate the frequency of each letter in the ciphertext
@@ -176,7 +176,7 @@ func readFromFile(f *os.File) string {
 }
 
 // stripJuliusHeader returns a string with the standard julius header/footer text removed
-func stripJuliusHeader(c *cli.Context, message string) string {
+func stripJuliusHeader(message string) string {
 	message = strings.Replace(message, encryptedMessageHeader, "", 1)
 	message = strings.Replace(message, encryptedMessageFooter, "", 1)
 
