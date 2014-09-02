@@ -71,6 +71,12 @@ func main() {
 			Usage:       "julius brute [message]",
 			Description: "Brute forces the key for a ciphertext by trying all possibly keys.",
 			Action:      bruteForceMessage,
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "first, f",
+					Usage: "Prints only the most likely brute forced plaintext.",
+				},
+			},
 		},
 	}
 
@@ -130,16 +136,23 @@ func bruteForceMessage(c *cli.Context) {
 		}
 	}
 
-	// Determine the most probable keys based on the frequency of letters in the English Alphabet
-	for index, letter := range englishFrequencyList {
+	if c.Bool("first") {
 		potentialMessage := new(Message)
-		potentialMessage.key = int((26 + (mostFrequentLetter - letter)) % 26)
+		potentialMessage.key = int((26 + (mostFrequentLetter - rune(englishFrequencyList[0]))) % 26)
 		potentialMessage.plaintext = caesar.DecryptCiphertext(inputMessage.ciphertext, potentialMessage.key)
-		potentialMessages[index] = *potentialMessage
-	}
+		fmt.Printf("[Key: %d]: %s\n", potentialMessage.key, potentialMessage.plaintext)
+	} else {
+		// Determine the most probable keys based on the frequency of letters in the English Alphabet
+		for index, letter := range englishFrequencyList {
+			potentialMessage := new(Message)
+			potentialMessage.key = int((26 + (mostFrequentLetter - letter)) % 26)
+			potentialMessage.plaintext = caesar.DecryptCiphertext(inputMessage.ciphertext, potentialMessage.key)
+			potentialMessages[index] = *potentialMessage
+		}
 
-	for _, message := range potentialMessages {
-		fmt.Printf("[Key: %d]: %s\n", message.key, message.plaintext)
+		for _, message := range potentialMessages {
+			fmt.Printf("[Key: %d]: %s\n", message.key, message.plaintext)
+		}
 	}
 }
 
