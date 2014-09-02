@@ -68,7 +68,7 @@ func main() {
 		{
 			Name:        "brute",
 			ShortName:   "b",
-			Usage:       "julius brute [message]",
+			Usage:       "julius brute [options] [message]",
 			Description: "Brute forces the key for a ciphertext by trying all possibly keys.",
 			Action:      bruteForceMessage,
 			Flags: []cli.Flag{
