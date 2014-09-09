@@ -28,7 +28,7 @@ type Message struct {
 func main() {
 	app := cli.NewApp()
 	app.Name = "julius"
-	app.Version = "0.2.0--dev"
+	app.Version = "0.2.0"
 	app.Usage = "Encrypt and decrypt messages using the Caesar cipher."
 	app.Commands = []cli.Command{
 		{
